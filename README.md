@@ -20,7 +20,7 @@ LIVOX-CAM is a visual-assisted LiDAR odometry based on KISS-ICP, specifically ta
 | M3DGR dataset      | ![](kiss_lv/doc/m3gdr.gif) |
 | MARS-LVIG dataset      | ![](kiss_lv/doc/mars.gif) |
 | High-altitude degraded scenarios      | ![](kiss_lv/doc/seua.gif) |
-| Underground garage      | ![](kiss_lv/doc/seug.gif) |
+| SEU dataset      | ![](kiss_lv/doc/seug.gif) |
 | Dark scene      | ![](kiss_lv/doc/dark.gif) |
 ---
 

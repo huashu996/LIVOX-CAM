@@ -1,0 +1,40 @@
+common:        
+   pcd_save_en: false  
+   Save_path: true
+   use_cam: true
+   ROOT_DIR: "/home/cxl/code/A-MY-WORK/KISS-LV/src/kiss_lv/ros/results"
+   save_frame_num_beg: 1
+   save_frame_num_end: 1600
+   lidar_topic: "/livox/lidar"
+   image_topic: "left_camera/image"    
+   child_frame: "base_link"
+   odom_frame: "odom"
+
+kiss_l:
+   voxel_size: 1.0
+   max_range: 100
+   min_range: 0.0
+   min_motion_th: 0.01
+   initial_threshold: 1.0
+   lidar_type: "LIVOX"
+   Deskew: true
+   Exp_key_num: 1000
+   
+
+kiss_v:
+   line_len: 30
+   line_wide: 2
+   point_th: 500
+   radius_size: 2
+   image_height: 1024        
+   image_weight: 1224   
+   distCoeffs: [-0.058079349939181,  0.134502746395860, 1.310282988798364e-05, 6.216594495554388e-04, 0.000000] 
+   intrisicMat:
+      [1.174433772943354e+03, 0.000000, 6.020977604990142e+02,
+    0.000000, 1.174477432586343e+03, 5.062372585153649e+02,
+    0.0, 0.0, 1.0 ] 
+   extrinsicMat_RT:
+      [ 0.030481734171511,  -0.999506201364453, -0.007630027254127, -0.146576504981955,
+      0.010470226985452,  0.007952445317845, -0.999913562744470, -0.128483331053416,
+      0.999480484166034, 0.030399211296810, 0.010707461125845, -0.046813878676557,
+                       0,                  0,                 0,                  1 ]

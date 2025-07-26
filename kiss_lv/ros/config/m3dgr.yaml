@@ -1,0 +1,41 @@
+common:        
+   pcd_save_en: false  
+   Save_path: true
+   use_cam: true
+   ROOT_DIR: "/home/cxl/code/A-MY-WORK/KISS-LV/src/kiss_lv/ros/results"
+   save_frame_num_beg: 1
+   save_frame_num_end: 1600
+   lidar_topic: "/livox/avia/lidar"
+   image_topic: "/camera/color/image_raw"    
+   child_frame: "base_link"
+   odom_frame: "odom"
+
+kiss_l:
+   voxel_size: 1.0
+   max_range: 100
+   min_range: 0.0
+   min_motion_th: 0.1
+   initial_threshold: 1.0
+   lidar_type: "LIVOX"
+   Deskew: true
+   Exp_key_num: 1000
+   
+
+kiss_v:
+   line_len: 30
+   line_wide: 2
+   point_th: 500
+   radius_size: 2
+   image_height: 480        
+   image_weight: 640   
+   distCoeffs: [0.0, 0.0, 0.00, 0.00, 0.000000] 
+   # Fine extrinsic value. form camera-LiDAR calibration.
+   intrisicMat:
+      [607.79772949218, 0.000000, 328.79772949218,
+    0.000000, 607.83526613281, 245.53321838378,
+    0.0, 0.0, 1.0 ] 
+   extrinsicMat_RT:
+         [0.0210767, -0.999397, -0.0275965,   0.0178448,
+          -0.0038717, 0.0275209, -0.999614,   0.0894589,
+          0.99977, 0.0211754, -0.0032894,   0.161556,
+          0.0, 0.0, 0.0, 1.0]

@@ -1,0 +1,40 @@
+common:        
+   pcd_save_en: false  
+   Save_path: true
+   use_cam: true
+   ROOT_DIR: "/home/cxl/code/A-MY-WORK/KISS-LV/src/kiss_lv/ros/results"
+   save_frame_num_beg: 1
+   save_frame_num_end: 1600
+   lidar_topic: "/livox/lidar"
+   image_topic: "/hikrobot_camera/rgb"    
+   child_frame: "base_link"
+   odom_frame: "odom"
+
+kiss_l:
+   voxel_size: 1.0
+   max_range: 100
+   min_range: 0.0
+   min_motion_th: 0.01
+   initial_threshold: 1
+   lidar_type: "LIVOX"
+   Deskew: true
+   Exp_key_num: 1000
+
+kiss_v:
+   line_len: 50
+   line_wide: 2
+   point_th: 500
+   radius_size: 2
+   image_height: 1024        
+   image_weight: 1280   
+   distCoeffs: [-0.095725, 0.089338, -0.002196, -0.000740, 0.000000] 
+   # Fine extrinsic value. form camera-LiDAR calibration.
+   intrisicMat:
+      [879.561594, 0.000000, 625.822231,
+    0.000000, 880.511632, 521.069512,
+    0.0, 0.0, 1.0 ] 
+   extrinsicMat_RT:
+         [0.0146031,-0.999817,-0.0123016,0.0135169,
+          -0.0147435,0.0120863,-0.999818,0.00881653,
+          0.999785,0.0147819,-0.0145643,0.0769928,
+          0.0, 0.0, 0.0, 1.0]

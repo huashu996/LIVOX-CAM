@@ -1,7 +1,7 @@
 # **LIVOX-CAM: Adaptive Coarse-to-Fine Visual-assisted LiDAR Odometry for Solid-State LiDAR**
 
-## 📌 Overview of LIVOX-CAM
-
+## ✅ 1. System Overview of LIVOX-CAM
+<img src="kiss_lv/doc/1.png" width="800">
 **LIVOX-CAM** is a visual-assisted LiDAR odometry system based on KISS-ICP, designed specifically for small field-of-view (FoV) solid-state LiDAR sensors. The system features a two-stage architecture:  
 1. **Front-end Module**: Robust key point extraction.  
 2. **Back-end Module**: Coarse-to-fine iterative pose optimization.  
@@ -13,21 +13,14 @@ LIVOX-CAM is optimized for stability in various challenging environments, includ
 - **Degenerate Scenarios**  
 - **High-altitude Mapping Tasks**
 
----
-
-### ✅ 1. System Overview
-<img src="kiss_lv/doc/1.png" width="800">
-
-#### Multi-layer Local Map Visualization
+### Multi-layer Local Map Visualization
 ![local_map](kiss_lv/doc/gif/local_map.gif)
 
-#### Support for Color Dense Mapping
+### Support for Color Dense Mapping
 ![colored_map](kiss_lv/doc/gif/colored_map.gif)
-
-
 ---
 
-### ✅ 2. Dataset Demos
+## ✅ 2. Dataset Demos
 
 | 📌Dataset                  | Demo |
 |--------------------------|------|
@@ -43,7 +36,7 @@ LIVOX-CAM is optimized for stability in various challenging environments, includ
 
 ---
 
-## ⚙️ Installation Guide
+## ✅ 3. Installation Guide
 
 ### 🔧 Recommended System Setup
 
@@ -107,6 +100,7 @@ LIVOX-CAM is optimized for stability in various challenging environments, includ
 
 ---
 
+## ✅ 4. Build and run
 ### 🔧 Building the Project
 
 ```bash

@@ -16,13 +16,10 @@ LIVOX-CAM is optimized for stability in various challenging environments, includ
 ---
 
 ### ✅ 1. System Overview
-<p align="center">
 <img src="kiss_lv/doc/1.png" width="800">
-</p>
 
 #### Multi-layer Local Map Visualization
 ![local_map](kiss_lv/doc/gif/local_map.gif)
-
 
 #### Support for Color Dense Mapping
 ![colored_map](kiss_lv/doc/gif/colored_map.gif)

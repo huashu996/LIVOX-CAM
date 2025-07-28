@@ -102,7 +102,7 @@ LIVOX-CAM is optimized for stability in various challenging environments, includ
 
 ---
 
-## ✅ 4. Build and run
+## ✅ 4. Build and Run
 ### 🔧 Building the Project
 
 ```bash

@@ -23,12 +23,12 @@ LIVOX-CAM is optimized for stability in various challenging environments, includ
 
 #### Multi-layer Local Map Visualization
 <center> 
-    ![local_map](kiss_lv/doc/local_map.gif)
+    ![local_map](kiss_lv/doc/gif/local_map.gif)
 </center>
 
 #### Support for Color Dense Mapping
 <center> 
-    ![colored_map](kiss_lv/doc/colored_map.gif)
+    ![colored_map](kiss_lv/doc/gif/colored_map.gif)
 </center>
 
 ---
@@ -37,15 +37,15 @@ LIVOX-CAM is optimized for stability in various challenging environments, includ
 
 | 📌Dataset                  | Demo |
 |--------------------------|------|
-| **Garden Dataset**        | ![](kiss_lv/doc/garden.gif) |
-| **Geode Dataset**         | ![](kiss_lv/doc/geode.gif) | 
-| **M3DGR Dataset**         | ![](kiss_lv/doc/m3gdr.gif) |
-| **MARS-LVIG Dataset**     | ![](kiss_lv/doc/mars.gif) |
-| **SEU Dataset**           | ![](kiss_lv/doc/seug.gif) |
+| **Garden Dataset**        | ![](kiss_lv/doc/gif/garden.gif) |
+| **Geode Dataset**         | ![](kiss_lv/doc/gif/geode.gif) | 
+| **M3DGR Dataset**         | ![](kiss_lv/doc/gif/m3gdr.gif) |
+| **MARS-LVIG Dataset**     | ![](kiss_lv/doc/gif/mars.gif) |
+| **SEU Dataset**           | ![](kiss_lv/doc/gif/seug.gif) |
 | **📌Challenging Scenarios** | Demo |
-| **Tunnel-degraded Scenarios** | ![](kiss_lv/doc/geode_de.gif) | 
-| **High-altitude Degraded Scenarios** | ![](kiss_lv/doc/seua.gif) |
-| **Dark Scene**            | ![](kiss_lv/doc/dark.gif) |
+| **Tunnel-degraded Scenarios** | ![](kiss_lv/doc/gif/geode_de.gif) | 
+| **High-altitude Degraded Scenarios** | ![](kiss_lv/doc/gif/seua.gif) |
+| **Dark Scene**            | ![](kiss_lv/doc/gif/dark.gif) |
 
 ---
 

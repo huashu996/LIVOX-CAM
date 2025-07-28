@@ -1,97 +1,123 @@
 # **LIVOX-CAM: Adaptive Coarse-to-Fine Visual-assisted LiDAR Odometry for Solid-State LiDAR**
 
-## 📌 What is LIVOX-CAM
+## 📌 Overview of LIVOX-CAM
 
-LIVOX-CAM is a visual-assisted LiDAR odometry based on KISS-ICP, specifically tailored for small field-of-view (FoV) solid-state LiDAR sensors. The system comprises a two-stage architecture: a front-end module for robust key point extraction and a back-end module implementing coarse-to-fine iterative pose optimization. Our system is capable of operating stably in autonomous driving, unstructured environments, handheld scenarios, degenerate cases, and high-altitude mapping tasks.
+**LIVOX-CAM** is a visual-assisted LiDAR odometry system based on KISS-ICP, designed specifically for small field-of-view (FoV) solid-state LiDAR sensors. The system features a two-stage architecture:  
+1. **Front-end Module**: Robust key point extraction.  
+2. **Back-end Module**: Coarse-to-fine iterative pose optimization.  
 
-### ✅ 1. System overview
+LIVOX-CAM is optimized for stability in various challenging environments, including:
+- **Autonomous Driving**  
+- **Unstructured Environments**  
+- **Handheld Scenarios**  
+- **Degenerate Cases**  
+- **High-altitude Mapping Tasks**
+
+---
+
+### ✅ 1. System Overview
 
 <div align="center">
   <img src="kiss_lv/doc/1.png" width="800">
 </div>
 
-# Multi-layer local map visualization
+#### Multi-layer Local Map Visualization
 <center> 
     ![local_map](kiss_lv/doc/local_map.gif)
 </center>
 
-# Support for color dense mapping
+#### Support for Color Dense Mapping
 <center> 
     ![colored_map](kiss_lv/doc/colored_map.gif)
 </center>
 
-### ✅ 2. Dataset Demo
-
-| Dataset | Demo |
-|-----------|--------|
-| Garden dataset     | ![](kiss_lv/doc/garden.gif) |
-| Geode dataset      | ![](kiss_lv/doc/geode.gif) | 
-| Tunnel-degraded scenarios      | ![](kiss_lv/doc/geode_de.gif) | 
-| M3DGR dataset      | ![](kiss_lv/doc/m3gdr.gif) |
-| MARS-LVIG dataset      | ![](kiss_lv/doc/mars.gif) |
-| High-altitude degraded scenarios      | ![](kiss_lv/doc/seua.gif) |
-| SEU dataset      | ![](kiss_lv/doc/seug.gif) |
-| Dark scene      | ![](kiss_lv/doc/dark.gif) |
 ---
 
-## ⚙️ Install
+### ✅ 2. Dataset Demos
 
-Recommended System **Ubuntu 20.04 + ROS Noetic**
+| Dataset                  | Demo |
+|--------------------------|------|
+| **Garden Dataset**        | ![](kiss_lv/doc/garden.gif) |
+| **Geode Dataset**         | ![](kiss_lv/doc/geode.gif) | 
+| **M3DGR Dataset**         | ![](kiss_lv/doc/m3gdr.gif) |
+| **MARS-LVIG Dataset**     | ![](kiss_lv/doc/mars.gif) |
+| **SEU Dataset**           | ![](kiss_lv/doc/seug.gif) |
+| **Challenging Scenarios** | Demo |
+| **Tunnel-degraded Scenarios** | ![](kiss_lv/doc/geode_de.gif) | 
+| **High-altitude Degraded Scenarios** | ![](kiss_lv/doc/seua.gif) |
+| **Dark Scene**            | ![](kiss_lv/doc/dark.gif) |
 
-### 🔧 Dependency
+---
+
+## ⚙️ Installation Guide
+
+### 🔧 Recommended System Setup
+
+- **Operating System**: Ubuntu 20.04
+- **ROS Version**: ROS Noetic
+
+### 🔧 Dependencies
+
+1. **Livox SDK**  
+    ```bash
+    cd livox_sdk/build
+    cmake ..
+    make -j8
+    sudo make install
+    ```
+
+2. **fmt**  
+    ```bash
+    cd fmt/build
+    cmake ..
+    make -j8
+    sudo make install
+    ```
+
+3. **Eigen**  
+    ```bash
+    cd eigen/build
+    cmake ..
+    make -j8
+    sudo make install
+    ```
+
+4. **Sophus**  
+    ```bash
+    sudo apt-get install ros-noetic-sophus
+    ```
+
+5. **Ceres Solver**  
+    ```bash
+    sudo apt-get install libceres-dev
+    ```
+
+6. **PCL (Point Cloud Library)**  
+    ```bash
+    sudo apt install libpcl-dev
+    sudo apt install pcl-tools
+    ```
+
+7. **OpenCV**  
+    ```bash
+    sudo apt install libopencv-dev python3-opencv
+    ```
+
+8. **Other Dependencies**  
+    ```bash
+    sudo apt-get install ros-noetic-tf2-sensor-msgs
+    sudo apt-get install ros-noetic-eigen-conversions
+    sudo apt-get install liboctomap-dev
+    sudo apt install ros-noetic-octomap ros-noetic-octomap-rviz
+    ```
+
+---
+
+### 🔧 Building the Project
 
 ```bash
-# 1. Livox SDK
-cd livox_sdk/build
-cmake ..
-make -j8
-sudo make install
-
-# 2. fmt
-cd fmt/build
-cmake ..
-make -j8
-sudo make install
-
-# 3. Eigen
-cd eigen/build
-cmake ..
-make -j8
-sudo make install
-
-# 4. Sophus
-sudo apt-get install ros-noetic-sophus
-
-# 5. Ceres Solver
-sudo apt-get install libceres-dev
-
-# 6. PCL
-sudo apt install libpcl-dev
-sudo apt install pcl-tools
-
-# 7. OpenCV
-sudo apt install libopencv-dev python3-opencv
-
-# 8. Others
-sudo apt-get install ros-noetic-tf2-sensor-msgs
-sudo apt-get install ros-noetic-eigen-conversions
-sudo apt-get install liboctomap-dev
-sudo apt install ros-noetic-octomap ros-noetic-octomap-rviz
-```
-
-### 🔧 Build
-```bash
-git clone 
+git clone https://github.com/your-repository/livox_cam.git
 cd livox_cam
 catkin build
 source devel/setup.bash
-```
-
-### 🔧 Run
-After modifying the config file for your environment, you can run Onion-LO. Here is an example to test it with a Livox LiDAR.
-```bash
-roslaunch kiss-lv livox.launch
-rosbag play your_data.bag
-```
-
 

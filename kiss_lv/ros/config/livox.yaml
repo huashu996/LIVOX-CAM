@@ -21,7 +21,7 @@ kiss_l:
    Exp_key_num: 1000
 
 kiss_v:
-   line_len: 50
+   line_len: 30
    line_wide: 2
    point_th: 500
    radius_size: 2

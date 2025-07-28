@@ -73,7 +73,7 @@ void KISS_LV::LVO(){
 		while (ros::ok()) {
 			MeasureGroup meas;
 			std::unique_lock<std::mutex> lock(mtx_buffer);
-			sig_buffer.wait(lock, [this, &meas]() -> bool { return Sync_packages(meas) || b_exit; });//同步
+			sig_buffer.wait(lock, [this, &meas]() -> bool { return Sync_packages(meas) || b_exit; });
 			lock.unlock();
 			if (b_exit) 
 			{
@@ -87,7 +87,11 @@ void KISS_LV::LVO(){
 			    continue;
 			}
 			save_timestamp=meas.lidar_msg->header.stamp;
+			auto start = std::chrono::steady_clock::now();
 			KISS_LV::Register_Color_Frame(meas.lidar_msg, meas.image);
+			auto end = std::chrono::steady_clock::now();
+			std::chrono::duration<double, std::milli> elapsed = end - start;
+			std::cout << "Register_Color_Frame took " << elapsed.count() << " ms" << std::endl;
 	}
 }
 bool KISS_LV::Sync_packages(MeasureGroup &measgroup) 
@@ -131,17 +135,6 @@ bool KISS_LV::Sync_packages(MeasureGroup &measgroup)
 				    measgroup.image = image;
 				}
 				image_buffer.pop_front();
-			}
-		}
-		for (const auto &GPS : GPS_buffer) {
-			double GPS_time = GPS.header.stamp.toSec();
-			if (GPS_time <= lidar_time) {
-				double time_diff = std::abs(lidar_time - GPS_time) / 2;
-				if (time_diff < min_time_diff) {
-				    min_time_diff = time_diff;
-				    measgroup.GPS = GPS;
-				}
-				GPS_buffer.pop_front();
 			}
 		}
 		lidar_pushed = false;
@@ -216,7 +209,7 @@ void KISS_LV::Register_Color_Frame(const sensor_msgs::PointCloud2::ConstPtr& lid
 		map_cloud = color_cloud;
 	}
 	
-	const auto Input_scan = Init_scan(color_cloud, adj_voxel_size, density);
+	const auto Input_scan = Adaptive_spatial_Module(color_cloud, adj_voxel_size, density);
 	const auto keypoint = LVodometry_.RegisterFrame(Input_scan, adj_voxel_size, density);
 
 	const auto pose = LVodometry_.poses().back();
@@ -287,7 +280,6 @@ void KISS_LV::Register_Color_Frame(const sensor_msgs::PointCloud2::ConstPtr& lid
 		path_msg_.poses.push_back(pose_msg);
 		traj_publisher_.publish(path_msg_);
 	}
-    // Publish KISS-ICP internal data, just for debugging
 	sensor_msgs::PointCloud2 rgb_pointscan;
 	pcl::toROSMsg(*rgb_cloud, rgb_pointscan);
 	rgb_pointscan.header.stamp = ros::Time::now();
@@ -359,45 +351,40 @@ void KISS_LV::processCameraData(const sensor_msgs::ImageConstPtr &msg,
                                  cv::Mat &feather_image,
                                  cv::Mat intrisicMat_Resize)
 {
-    try
-    {
-
-        cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
-        const cv::Mat& image = cv_ptr->image;
-
+    try {
         static cv::Mat map1, map2;
         static bool map_initialized = false;
-        if (!map_initialized)
-        {
-            cv::initUndistortRectifyMap(un_intrisicMat, distCoeffs, cv::Mat(),
-                                        un_intrisicMat, image.size(), CV_16SC2, map1, map2);
-            map_initialized = true;
-        }
-        cv::Mat undistorted;
-        cv::remap(image, undistorted, map1, map2, cv::INTER_LINEAR);
-
-        new_image = ALTM_retinex(undistorted);
-
-        cv::Mat resize_image;
-        cv::resize(new_image, resize_image, cv::Size(W / resize, H / resize));
-
-        static cv::Ptr<cv::xphoto::SimpleWB> wb = cv::xphoto::createSimpleWB();  // 只创建一次
+        static cv::Ptr<cv::xphoto::SimpleWB> wb = cv::xphoto::createSimpleWB();
         wb->setInputMin(0.0f);
         wb->setInputMax(255.0f);
-        cv::Mat balanced_image;
-        wb->balanceWhite(resize_image, balanced_image);
 
-        cv::Mat gray_image;
-        cv::cvtColor(balanced_image, gray_image, cv::COLOR_BGR2GRAY);
-        cv::medianBlur(gray_image, gray_image, 3);
+        cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+        const cv::Mat& raw_img = cv_ptr->image;
 
-        feather_image = get_image_keypoints(gray_image, line_th, line_len, line_wide, point_th, radius_size);
+        if (!map_initialized) {
+            cv::initUndistortRectifyMap(un_intrisicMat, distCoeffs, cv::Mat(),
+                                        un_intrisicMat, raw_img.size(), CV_16SC2, map1, map2);
+            map_initialized = true;
+        }
+
+        cv::Mat undistorted;
+        cv::remap(raw_img, undistorted, map1, map2, cv::INTER_LINEAR);
+        new_image = ALTM_retinex(undistorted);
+
+        cv::Mat small_img;
+        cv::resize(new_image, small_img, cv::Size(W / resize, H / resize));
+        wb->balanceWhite(small_img, small_img);
+
+        cv::Mat gray;
+        cv::cvtColor(small_img, gray, cv::COLOR_BGR2GRAY);
+        cv::medianBlur(gray, gray, 3);
+        feather_image = get_image_keypoints(gray, line_th, line_len, line_wide, point_th, radius_size);
     }
-    catch (cv_bridge::Exception &e)
-    {
+    catch (cv_bridge::Exception &e) {
         ROS_ERROR("Could not convert from '%s' to 'bgr8'.", msg->encoding.c_str());
     }
 }
+
 
 void KISS_LV::resetParameters(){ 
 	  good_points->clear();
@@ -440,7 +427,7 @@ std::vector<Eigen::Vector3d> DeSkewScan(const std::vector<Eigen::Vector3d> &fram
     if (N <= 2) return frame;
     const auto& start_pose = pose_deskew[N - 2];
     const auto& finish_pose = pose_deskew[N - 1];
-    const auto delta_pose = (start_pose.inverse() * finish_pose).log(); //scan开始到结束的变化位姿
+    const auto delta_pose = (start_pose.inverse() * finish_pose).log();
     if (!delta_pose.allFinite()) {
         std::cerr << "[DeSkewScan] Invalid delta_pose (NaN or Inf detected)" << std::endl;
         return frame;
@@ -533,55 +520,103 @@ Vector6dVector Get_FeatrueScan(const std::vector<Eigen::Vector3d>& laser_data,
     int W = feather_image.cols;
     Vector6dVector pl_points;
 
-    for (const auto& point_eigen : laser_data) {
-        cv::Mat pointLidar = (cv::Mat_<double>(4, 1) << point_eigen[0], point_eigen[1], point_eigen[2], 1.0);
-        cv::Mat tempPoint = extrinsicMat_RT * pointLidar;
-        cv::Mat pointImage = intrisicMat * (tempPoint / tempPoint.at<double>(2, 0));
-        Eigen::Vector3d color(55, 100, 55);
-        if (pointImage.at<double>(0, 0) >= 0 && pointImage.at<double>(0, 0) < W &&
-            pointImage.at<double>(1, 0) >= 0 && pointImage.at<double>(1, 0) < H && point_eigen[0]>0) {
-            auto pixelColor = feather_image.at<cv::Vec3b>(static_cast<int>(pointImage.at<double>(1, 0)),
-                                                           static_cast<int>(pointImage.at<double>(0, 0)));
-            if ((pixelColor[0] == 255 && pixelColor[2] == 55) ||
-                (pixelColor[0] == 55 && pixelColor[2] == 255)) {
-                color[0] = pixelColor[2]; // r
-                color[1] = 55; // g
-                color[2] = pixelColor[0]; // b
+    Eigen::Matrix<double, 3, 3> intrinsic;
+    Eigen::Matrix<double, 4, 4> extrinsic;
+    cv::cv2eigen(intrisicMat, intrinsic);
+    cv::cv2eigen(extrinsicMat_RT, extrinsic);
+
+    #pragma omp parallel
+    {
+        Vector6dVector local_points;
+
+        #pragma omp for nowait
+        for (int i = 0; i < laser_data.size(); ++i) {
+            const auto& pt = laser_data[i];
+
+
+            if (pt[0] <= 0)
+                continue;
+
+            Eigen::Vector4d pointLidar(pt[0], pt[1], pt[2], 1.0);
+            Eigen::Vector4d tempPoint = extrinsic * pointLidar;
+
+            if (tempPoint[2] <= 0) continue;
+
+            Eigen::Vector3d imgPoint = intrinsic * tempPoint.head<3>() / tempPoint[2];
+
+            int u = static_cast<int>(imgPoint[0]);
+            int v = static_cast<int>(imgPoint[1]);
+            if (u >= 0 && u < W && v >= 0 && v < H) {
+                Eigen::Vector3d color(55, 100, 55);
+
+                const uchar* pixel = feather_image.ptr<uchar>(v) + 3 * u;
+                uchar b = pixel[0];
+                uchar g = pixel[1];
+                uchar r = pixel[2];
+
+                if ((b == 255 && r == 55) || (b == 55 && r == 255)) {
+                    color[0] = static_cast<double>(r);
+                    color[1] = 55.0;
+                    color[2] = static_cast<double>(b);
+                }
+
+                Vector6d point;
+                point << pt, color;
+                local_points.push_back(point);
             }
         }
-
-        Vector6d coloredPoint;
-        coloredPoint << point_eigen, color;
-        pl_points.push_back(coloredPoint);
+        #pragma omp critical
+        pl_points.insert(pl_points.end(), local_points.begin(), local_points.end());
     }
 
     return pl_points;
 }
 Vector6dVector Get_map_cloud(const std::vector<Eigen::Vector3d>& laser_data,
-                                           const cv::Mat& intrisicMat,
-                                           const cv::Mat& extrinsicMat_RT,
-                                           const cv::Mat& new_image) {
+                             const cv::Mat& intrisicMat,
+                             const cv::Mat& extrinsicMat_RT,
+                             const cv::Mat& new_image) {
     int H = new_image.rows;
     int W = new_image.cols;
     Vector6dVector rgb_points;
 
-    for (const auto& point : laser_data) {
-        Eigen::Vector4d pointLidar(point.x(), point.y(), point.z(), 1.0);
-        cv::Mat pointLidar_cv(4, 1, CV_64FC1);
-        
-        for (int i = 0; i < 4; ++i) {
-            pointLidar_cv.at<double>(i, 0) = pointLidar(i);
-        }
-        cv::Mat pointImage = intrisicMat * extrinsicMat_RT * pointLidar_cv;
-        cv::Point2f pixelPoint(pointImage.at<double>(0, 0) / pointImage.at<double>(2, 0),
-                               pointImage.at<double>(1, 0) / pointImage.at<double>(2, 0));
+    Eigen::Matrix3d intrinsic;
+    Eigen::Matrix4d extrinsic;
+    cv::cv2eigen(intrisicMat, intrinsic);
+    cv::cv2eigen(extrinsicMat_RT, extrinsic);
 
-        if (pixelPoint.x >= 0 && pixelPoint.x < W && pixelPoint.y >= 0 && pixelPoint.y < H) {
-            auto color = new_image.at<cv::Vec3b>(pixelPoint.y, pixelPoint.x);
-            Vector6d rgb_point;
-            rgb_point << point.x(), point.y(), point.z(), color[2], color[1], color[0];
-            rgb_points.push_back(rgb_point);
+    #pragma omp parallel
+    {
+        Vector6dVector local_points;
+
+        #pragma omp for nowait
+        for (int i = 0; i < laser_data.size(); ++i) {
+            const auto& pt = laser_data[i];
+            Eigen::Vector4d pt_lidar(pt.x(), pt.y(), pt.z(), 1.0);
+
+            Eigen::Vector4d pt_cam = extrinsic * pt_lidar;
+            if (pt_cam[2] <= 0) continue;
+
+            Eigen::Vector3d pt_img = intrinsic * pt_cam.head<3>() / pt_cam[2];
+
+            int u = static_cast<int>(pt_img[0]);
+            int v = static_cast<int>(pt_img[1]);
+
+            if (u >= 0 && u < W && v >= 0 && v < H) {
+                const uchar* pixel = new_image.ptr<uchar>(v) + 3 * u;
+                uchar b = pixel[0];
+                uchar g = pixel[1];
+                uchar r = pixel[2];
+
+                Vector6d rgb_point;
+                rgb_point << pt.x(), pt.y(), pt.z(),
+                             static_cast<double>(r),
+                             static_cast<double>(g),
+                             static_cast<double>(b);
+                local_points.push_back(rgb_point);
+            }
         }
+        #pragma omp critical
+        rgb_points.insert(rgb_points.end(), local_points.begin(), local_points.end());
     }
     return rgb_points;
 }
@@ -596,7 +631,7 @@ Vector6dVector Trans_Vector6(const std::vector<Eigen::Vector3d>& laser_data){
 	return laser_data_extended;
 }
 
-Vector6dVector KISS_LV::Init_scan(const Vector6dVector& color_cloud, double &adj_voxel_size, double &density) {
+Vector6dVector KISS_LV::Adaptive_spatial_Module(const Vector6dVector& color_cloud, double &adj_voxel_size, double &density) {
     Vector6dVector filtered_vector_array;
     int point_num = 0;
     density = 0.0;
@@ -611,7 +646,7 @@ Vector6dVector KISS_LV::Init_scan(const Vector6dVector& color_cloud, double &adj
     }
     int voxel_num;
     double exp_voxel_num = point_num/exp_key_num;
-    double init_volume = CalculatePointCloudVolume(filtered_vector_array, config_.voxel_size, 0, voxel_num);
+    double init_volume = CalculatePointCloudVolume(filtered_vector_array, config_.voxel_size, 3, voxel_num);
     density = ceil(point_num / voxel_num);
     double vc = pow(exp_voxel_num*config_.voxel_size*config_.voxel_size*config_.voxel_size/density, 1.0/3.0);
     if (!filtered_vector_array.empty()) {
@@ -622,6 +657,7 @@ Vector6dVector KISS_LV::Init_scan(const Vector6dVector& color_cloud, double &adj
         density = 20;
     }
     std::cout<<"+++++++++++++++"<<std::endl;
+    cout<<"point_num--"<<point_num<<endl;
     cout<<"adj_voxel_size--"<<adj_voxel_size<<endl;
     cout<<"density--"<<density<<endl;
     return filtered_vector_array;
@@ -705,14 +741,14 @@ cv::Mat ALTM_retinex(const cv::Mat& img)
 
 std::vector<Vec4f> detectLineFeatures(Mat gray_image, int line_len)
 {
-    opts.refine       = 1;     //1
-	opts.scale        = 0.8;   //0.8 
-	opts.sigma_scale  = 1.5;	//0.6
-	opts.quant        = 2.0;	//2.0 
-	opts.ang_th       = 22.5;	//22.5
-	opts.log_eps      = 0;	//0	
-	opts.density_th   = 0.6;	//0.7	
-	opts.n_bins       = 1024;	//1024 
+    opts.refine       = 1;  
+	opts.scale        = 0.8; 
+	opts.sigma_scale  = 1.5;	
+	opts.quant        = 2.0;
+	opts.ang_th       = 22.5;	
+	opts.log_eps      = 0;
+	opts.density_th   = 0.6;
+	opts.n_bins       = 1024;
 	opts.min_length = 0.125;
 	cv::Ptr<cv::LineSegmentDetector> ls = cv::createLineSegmentDetector(opts.refine,
 	                                                           opts.scale,

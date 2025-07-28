@@ -65,7 +65,7 @@ struct Color_VoxelHashMap {
     void Color_AddPoints(const std::vector<Vector7d> &points);
     void Color_RemovePointsFarFromLocation(const Eigen::Vector3d &origin);
     void Get_adj_voxel_size(const double density){
-    	max_points_per_voxel_ = std::clamp(static_cast<int>(density), 3, 100);
+    	max_points_per_voxel_ = std::clamp(static_cast<int>(0.5*density), 3, 100);
 		num_range_1 = 1;
 		range_1 = 27;
 		scan_num_++;

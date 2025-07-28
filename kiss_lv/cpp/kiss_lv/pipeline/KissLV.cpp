@@ -71,30 +71,7 @@ Vector7dVector KissLV::RegisterFrame(const Vector6dVector color_frame, double ad
     scan_num++;
 
     color_local_map_.Color_Update(cd_scan, new_pose);
-
     poses_.push_back(new_pose);
-	/*
-    auto end = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-    std::ofstream foutC("/home/cxl/workspace/KISS_LV/src/kiss_lv/ros/results/time.txt", std::ios::app);
-    int exp_num = static_cast<int>(pow(2/vs1+density*0, 3));
-	foutC.setf(std::ios::fixed, std::ios::floatfield);
-	// 保存结果的精度
-	
-	foutC.precision(3);
-	foutC <<density << " "
-		   <<adj_voxel_size<< " "
-		   <<cd_scan2.size()<< " "
-		   <<exp_num+8<< " "
-	       <<duration<< std::endl;
-	foutC.close();
-	std::cout << "-----------------kiss-lv------------------" << std::endl;
-    std::cout << "density：" << density << std::endl; 
-    std::cout << "subsample1：" << vs1 << std::endl; 
-    std::cout << "subsample2：" << vs2 << std::endl; 
-   	std::cout << "cd_scan NUM：" << cd_scan.size() << std::endl;
-	//std::cout << "cd_scan2 NUM：" << cd_scan2.size() << std::endl;
-	*/
 	std::cout << "th_w: " << th_w << std::endl;
     std::cout << "max_correspondance_distance: " << max_distance << std::endl;
 	return cd_scan;

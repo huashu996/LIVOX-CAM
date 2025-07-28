@@ -14,7 +14,7 @@ kiss_l:
    voxel_size: 1.0
    max_range: 100
    min_range: 0.0
-   min_motion_th: 0.1
+   min_motion_th: 0.05
    initial_threshold: 1.0
    lidar_type: "LIVOX"
    Deskew: true

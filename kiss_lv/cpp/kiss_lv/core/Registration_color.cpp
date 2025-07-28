@@ -115,7 +115,7 @@ Sophus::SE3d Color_AlignClouds(const std::vector<Eigen::Vector7d> &source,
                 const auto &[J_r, pos_residual] = compute_jacobian_and_residual(i);
 				auto color_residual = ((source[i].template tail<3>() - target[i].template tail<3>()).template cast<double>()).squaredNorm();
 				auto tar_color_norm_sq = (target[i].template tail<3>().template cast<double>()).squaredNorm();
-				double wc = square(tar_color_norm_sq / (tar_color_norm_sq + color_residual));
+				double wc = tar_color_norm_sq / (tar_color_norm_sq + color_residual);
                 JTJ_private.noalias() += J_r.transpose() *wc* J_r;
                 JTr_private.noalias() += J_r.transpose() *wc* pos_residual;
             }
@@ -153,7 +153,7 @@ Sophus::SE3d Color_RegisterFrame(
     Sophus::SE3d T_icp2 = Sophus::SE3d();
 	for (int i = 0; i < MAX_NUM_ITERATIONS_; ++i) {
 	    const auto &[k_src, k_tgt] = color_voxel_map.Color_GetCorrespondences(key_source, max_correspondence_distance);
-		if (k_src.size()>30){
+		if (k_src.size()>20){
 			auto estimation = Color_AlignClouds(k_src, k_tgt); 
 			Color_TransformPoints(estimation, key_source);
 			T_icp = estimation * T_icp;
@@ -168,7 +168,7 @@ Sophus::SE3d Color_RegisterFrame(
 	for (int j = 0; j < MAX_NUM_ITERATIONS_; ++j) {
         // Equation (10)
         const auto &[src, tgt] = color_voxel_map.Color_GetCorrespondences(source, max_correspondence_distance);
-        if (src.size()>30){
+        if (src.size()>20){
 		    auto estimation2 = AlignClouds(src, tgt, kernel); 
 		    Color_TransformPoints(estimation2, source);
 		    T_icp2 = estimation2 * T_icp2;

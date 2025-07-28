@@ -29,7 +29,7 @@ namespace {
 double ComputeModelError(const Sophus::SE3d &model_deviation, double max_range, double vs_size) {
     const double theta = Eigen::AngleAxisd(model_deviation.rotationMatrix()).angle();
     const double delta_rot = 2.0 * vs_size*max_range * std::sin(theta / 2.0);
-    const double delta_trans = model_deviation.translation().norm();
+    const double delta_trans = model_deviation.translation().norm()/vs_size;
     return delta_trans + delta_rot;
 }
 }  // namespace

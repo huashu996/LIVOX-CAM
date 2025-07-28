@@ -9,6 +9,10 @@
 #include <vector>
 #include <cmath>
 #include <algorithm>
+#include <omp.h>
+#include <unordered_set>
+#include <tsl/robin_map.h>
+
 // ROS
 #include "ros/ros.h"
 #include "ros/init.h"
@@ -180,7 +184,7 @@ public:
     bool Sync_packages(MeasureGroup &measgroup);
     void Register_Color_Frame(const sensor_msgs::PointCloud2::ConstPtr& lidar_msg, const sensor_msgs::ImageConstPtr &img_msg);
     void processLidarData(const sensor_msgs::PointCloud2::ConstPtr& lidar_msg, std::vector<Eigen::Vector3d> &deskew_scan);
-    Vector6dVector Init_scan(const Vector6dVector& color_cloud, double &adj_voxel_size, double &density);
+    Vector6dVector Adaptive_spatial_Module(const Vector6dVector& color_cloud, double &adj_voxel_size, double &density);
 	void processCameraData(const sensor_msgs::ImageConstPtr &msg, cv::Mat &new_image, cv::Mat &feather_image, cv::Mat intrisicMat_Resize);
 	Vector6dVector XYZRGB2Vector6dVector(const PointCloudXYZRGB::Ptr& pcl_cloud);
 	void resetParameters();

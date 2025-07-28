@@ -20,12 +20,9 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-#创建一个名为"pipeline"的静态库。
+
 add_library(pipeline STATIC)
-#创建一个别名，将"kiss_icp::pipeline"指向之前创建的"pipeline"静态库
 add_library(kiss_lv::pipeline ALIAS pipeline)
-#向"pipeline"静态库添加私有源文件"KissICP.cpp"
 target_sources(pipeline PRIVATE KissLV.cpp)
-#将名为"kiss_icp::core"的公共库与"pipeline"静态库进行链接。
 target_link_libraries(pipeline PUBLIC kiss_lv::core)
 set_global_target_properties(pipeline)

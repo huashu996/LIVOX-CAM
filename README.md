@@ -10,7 +10,17 @@ LIVOX-CAM is a visual-assisted LiDAR odometry based on KISS-ICP, specifically ta
   <img src="kiss_lv/doc/1.png" width="800">
 </div>
 
-### ✅ 2. Demo
+# Multi-layer local map visualization
+<center> 
+    ![local_map](kiss_lv/doc/local_map.gif)
+</center>
+
+# Support for color dense mapping
+<center> 
+    ![colored_map](kiss_lv/doc/colored_map.gif)
+</center>
+
+### ✅ 2. Dataset Demo
 
 | Dataset | Demo |
 |-----------|--------|

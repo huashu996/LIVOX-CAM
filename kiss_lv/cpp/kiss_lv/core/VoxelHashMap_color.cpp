@@ -87,7 +87,6 @@ Color_VoxelHashMap::Vector7dVectorTuple Color_VoxelHashMap::Color_GetCorresponde
                 const auto &points = search->second.points;
 		            if (!points.empty()) {
 		                for (const auto &point2 : points) {
-		                	//if (point2[3]==point[3] && point2[5]==point[5])
 		                    	neighboors.emplace_back(point2); 
 		                }
 		            }
@@ -201,20 +200,17 @@ void Color_VoxelHashMap::Color_RemovePointsFarFromLocation(const Eigen::Vector3d
     for (const auto &[voxel, voxel_block] : colormap_) {
         if (voxel[3]== -1){
             const auto &pt = voxel_block.points.front();
-		    if (scan_num_-pt[6]>50) {
+		    if (scan_num_-pt[6]>30) {
 		    	colormap_.erase(voxel);
 		    }
         }
         else{
             const auto &pt = voxel_block.points.front();
-		    const auto max_distance2 = 5*max_distance_*max_distance_;
-		    if ((pt.head<3>() - origin).squaredNorm() > (max_distance2) ) {
+		    const auto max_distance2 = 5.0*max_distance_;
+		    if ((pt.head<3>() - origin).norm() > (max_distance2) ) {
 		    	colormap_.erase(voxel);
 		    }
         }
        }
      }
 }  // namespace kiss_lv
-
-
-

@@ -49,7 +49,7 @@ Vector7dVector Color_VoxelDownsample(const Vector7dVector &frame,
     for (const auto &point : frame) {
 		double voxel_size_c = voxel_size;
 		if (point[3] == 255 && point[5]== 255)
-			voxel_size_c = voxel_size*0.5;
+			voxel_size_c = voxel_size*0.3;
 	Voxel voxel;
 	int voxel_x = static_cast<int>(point[0] / (voxel_size_c));
 	int voxel_y = static_cast<int>(point[1] / (voxel_size_c));
@@ -75,7 +75,7 @@ Vector7dVectorTuple PL_VoxelDownsample(const Vector7dVector &frame,
     double voxel_size_c;
     for (const auto &point : frame) {
         if (point[3] == 255 || point[5] == 255) {
-            voxel_size_c = voxel_size*0.5;
+            voxel_size_c = voxel_size*0.3;
             Voxel voxel;
             int voxel_x = static_cast<int>(point[0] / voxel_size_c);
             int voxel_y = static_cast<int>(point[1] / voxel_size_c);

@@ -42,7 +42,12 @@ LIVOX-CAM is optimized for stability in various challenging environments, includ
 | **M3DGR Dataset**         | ![](kiss_lv/doc/m3gdr.gif) |
 | **MARS-LVIG Dataset**     | ![](kiss_lv/doc/mars.gif) |
 | **SEU Dataset**           | ![](kiss_lv/doc/seug.gif) |
-| **📌Challenging Scenarios** | Demo |
+<table align="center">
+  <tr>
+    <td><strong>📌 Challenging Scenarios</strong></td>
+    <td>Demo</td>
+  </tr>
+</table>
 | **Tunnel-degraded Scenarios** | ![](kiss_lv/doc/geode_de.gif) | 
 | **High-altitude Degraded Scenarios** | ![](kiss_lv/doc/seua.gif) |
 | **Dark Scene**            | ![](kiss_lv/doc/dark.gif) |
@@ -127,5 +132,3 @@ source devel/setup.bash
 ```bash
 roslaunch kiss-lv livox.launch
 rosbag play your_data.bag
-
-

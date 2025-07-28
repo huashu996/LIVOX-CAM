@@ -2,7 +2,7 @@
 
 ## ✅ 1. System Overview of LIVOX-CAM
 
-<img src="kiss_lv/doc/1.png" width="800" height="600">
+<img src="kiss_lv/doc/1.png" width="800">
 
 **LIVOX-CAM** is a visual-assisted LiDAR odometry system based on KISS-ICP, designed specifically for small field-of-view (FoV) solid-state LiDAR sensors. The system features a two-stage architecture:  
 1. **Front-end Module**: Data pre-processing and fusion.  
